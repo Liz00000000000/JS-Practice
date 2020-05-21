@@ -6,16 +6,19 @@ const horrorUrl = 'http://localhost:4000/horror'
 const actionDiv = document.querySelector('#action')
 const comedyDiv = document.querySelector('#comedy')
 const horrorDiv = document.querySelector('#horror')
+const option = document.querySelector('select')
+const topBar = document.querySelector('.tools')
 
 function loadMovies(array, div){
     if (array.length == 1){
         const liNew = document.createElement('li')
         liNew.setAttribute('id',`${array[0].id}`)
         liNew.innerHTML = `<h3>${array[0].title}</h3>
-        <h4 id='cast'> Starting ${array[0].cast[0].name}, ${array[0].cast[1].name}, and ${array[0].cast[2].name}</h4>
+        <p>${array[0]['duration-in-hours']} hours long</p>
+        <h4 id='cast'> ${array[0].cast[0].name} as ${array[0].cast[0].character}, ${array[0].cast[1].name} as ${array[0].cast[1].character}, and ${array[0].cast[2].name} as ${array[0].cast[2].character}</h4>
         <button>View Cast</button><br>
         <input placeholder='Adrian Brody'><br>
-        <button>Add Cast Member</button><br>
+        <button id='add'>Add Cast Member</button><br>
         <img src="${array[0].cover}"><br>
         <button>Back</button>`
         div.append(liNew)
@@ -24,7 +27,8 @@ function loadMovies(array, div){
        const li = document.createElement('li')
        li.setAttribute('id',`${movie.id}`)
        li.innerHTML = `<h3>${movie.title}</h3>
-       <h4 id='cast'> Starting ${movie.cast[0].name}, ${movie.cast[1].name}, and ${movie.cast[2].name}</h4>
+       <p>${movie['duration-in-hours']} hours long</p>
+       <h4 id='cast'>${movie.cast[0].name} as ${movie.cast[0].character}, ${movie.cast[1].name} as ${movie.cast[1].character}, and ${movie.cast[2].name} as ${movie.cast[2].character}</h4>
        <button>View Cast</button><br>
        <img src="${movie.cover}">`
        div.append(li) })
@@ -69,13 +73,30 @@ document.addEventListener('click', function(e){
         fetch(actionUrl).then(res => res.json()).then(actionMovies => loadMovies(actionMovies, actionDiv))
         fetch(comendyUrl).then(res => res.json()).then(comedyMovies => loadMovies(comedyMovies, comedyDiv))
         fetch(horrorUrl).then(res => res.json()).then(horrorMovies => loadMovies(horrorMovies, horrorDiv))
-    } else if (e.target.innerHTML === 'Add Cast Member'){
-
-        const castTag = e.target.parentElement.querySelector('#cast')
-        const currectCast = e.target.parentElement.querySelector('#cast').innerText
-        console.log(castTag)
-        
-    }
+    } else if (e.target.innerText == 'Add Cast Member'){
+        e.preventDefault()
+      const castTag = e.target.parentElement.parentElement.querySelector('#cast')
+      const currectCast = e.target.parentElement.querySelector('#cast').innerText
+      const newCastMember = document.querySelector('input').value
+      castTag.innerText = newCastMember + ', ' + currectCast
+      
+  } else if (e.target.innerText == 'Add Movie'){
+      const form = document.createElement('form')
+      form.innerHTML = '<input placeholder="new movie title"><br><input placeholder="length in hours"><br><input placeholder="coverphoto"><br><input placeholder="cast"><br><button>Submit</button>'
+      topBar.append(form)
+  } else if (e.target.innerText == 'Submit'){
+      e.preventDefault()
+      const newDiv = document.createElement('div')
+      newDiv.setAttribute('class','movie-list')
+      const newTitle = document.querySelectorAll('input')[0].value
+      const newLegnth = document.querySelectorAll('input')[1].value
+      const newPhoto = document.querySelectorAll('input')[2].value
+      const newCast = document.querySelectorAll('input')[3].value
+      console.log(newTitle, newLegnth, newPhoto, newCast)
+      newDiv.innerHTML = `<h2>${newTitle}<h2><p>${newLegnth} hours long</p><h4>${newCast}</h4>`
+      topBar.append(newDiv)
+      form.reset()
+  }
 })
 
 
@@ -85,8 +106,7 @@ fetch(comendyUrl).then(res => res.json()).then(comedyMovies => loadMovies(comedy
 fetch(horrorUrl).then(res => res.json()).then(horrorMovies => loadMovies(horrorMovies, horrorDiv))
 
 
-document.addEventListener('change', function(e){
-     console.log(e.target.value)
+option.addEventListener('change', function(e){
         actionDiv.innerHTML = ' '
         comedyDiv.innerHTML = ' '
         horrorDiv.innerHTML = ' '
@@ -101,7 +121,8 @@ document.addEventListener('change', function(e){
         fetch(horrorUrl).then(res => res.json()).then(horrorMovies => loadMovies(horrorMovies, horrorDiv))
     } else if (e.target.value == 'action'){
         fetch(actionUrl).then(res => res.json()).then(actionMovies => loadMovies(actionMovies, actionDiv))
-    }
+    } else {e.preventDefault()}
+
 })
 
 
